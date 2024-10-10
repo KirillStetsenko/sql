@@ -1,31 +1,17 @@
-import express from 'express';
-import mysql from 'mysql2';
-import mysqlAdmin from 'node-mysql-admin';
+import mysql from 'mysql2/promise';
 
-const connection = mysql.createConnection({
-	host: '127.0.0.1',
+const connection = await mysql.createConnection({
+	host: 'localhost',
 	user: 'Skiper',
 	password: '123456',
-	database: 'mysql',
+	database: 'mybase',
 });
 
-connection.connect((err) => {
-	if (err) {
-		console.error('Connection error', err.stack);
-		return;
-	}
-	console.log('Connection to database as id' + connection.threadId);
-});
+let query = 'SELECT name FROM users WHERE age = 27';
 
-const app = express();
-
-app.get('/', (req, res) => {
-	res.send('Welcome to the MySQL Admin Dashboard');
-});
-
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
-
-app.use(mysqlAdmin(app));
-
-app.listen(3000, () => console.log('Server works at port 3000'));
+try {
+	let [results] = await connection.query(query);
+	console.log(results);
+} catch (err) {
+	console.log('Error', err);
+}
